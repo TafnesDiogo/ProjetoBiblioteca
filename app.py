@@ -12,6 +12,8 @@ class Livro(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(100), nullable=False)
     autor = db.Column(db.String(100), nullable=False)
+    ano_publicacao = db.Column(db.Integer, nullable=False)
+    genero = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
         return f'<Livro {self.titulo}>'
@@ -20,7 +22,7 @@ class Livro(db.Model):
 @app.route('/livro', methods=['POST'])
 def adicionar_livro():
     dados = request.json
-    novo_livro = Livro(titulo=dados['titulo'], autor=dados['autor'])
+    novo_livro = Livro(titulo=dados['titulo'], autor=dados['autor'], ano_publicacao=dados['ano_publicacao'], genero=dados['genero'])
     db.session.add(novo_livro)
     db.session.commit()
     return jsonify({'mensagem': 'Livro adicionado com sucesso!'}), 201
@@ -28,12 +30,12 @@ def adicionar_livro():
 @app.route('/livros', methods=['GET'])
 def listar_livros():
     livros = Livro.query.all()
-    return jsonify([{'id': livro.id, 'titulo': livro.titulo, 'autor': livro.autor} for livro in livros])
+    return jsonify([{'id': livro.id, 'titulo': livro.titulo, 'autor': livro.autor, 'ano_publicacao': livro.ano_publicacao, 'genero': livro.genero} for livro in livros])
 
 @app.route('/livro/<int:id>', methods=['GET'])
 def pegar_livro(id):
     livro = Livro.query.get_or_404(id)
-    return jsonify({'id': livro.id, 'titulo': livro.titulo, 'autor': livro.autor})
+    return jsonify({'id': livro.id, 'titulo': livro.titulo, 'autor': livro.autor, 'ano_publicacao': livro.ano_publicacao, 'genero': livro.genero})
 
 @app.route('/livro/<int:id>', methods=['PUT'])
 def atualizar_livro(id):
@@ -41,6 +43,8 @@ def atualizar_livro(id):
     dados = request.json
     livro.titulo = dados.get('titulo', livro.titulo)
     livro.autor = dados.get('autor', livro.autor)
+    livro.ano_publicacao = dados.get('ano_publicacao', livro.ano_publicacao)
+    livro.genero = dados.get('genero', livro.genero)
     db.session.commit()
     return jsonify({'mensagem': 'Livro atualizado com sucesso!'})
 
